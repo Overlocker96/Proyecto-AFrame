@@ -47,7 +47,11 @@
              event-set__lights3="_event: mousedown; _target: #LIGHT3; light.intensity: 1"
              event-set__lights4="_event: mousedown; _target: #LIGHT4; light.intensity: 1"
              event-set__lights5="_event: mousedown; _target: #LIGHT; material.emissive: #FFFFAA"
-             event-set__lights6="_event: mousedown; _target: #LIGHT2; material.emissive: #FFFFAA"></a-box>
+             event-set__lights6="_event: mousedown; _target: #LIGHT2; material.emissive: #FFFFAA"
+             event-set__enter="_event: mouseenter; _target: #TEXT1; visible: true"
+             event-set__leave="_event: mouseleave; _target: #TEXT1; visible: false">
+             <a-text id="TEXT1" value="Pulsa para activar las luces" scale="0.2 0.2 0.2" position="-0.2 0.2 0" visible= "false"></a-text>
+      </a-box>
       <a-box color="#E7CFB7" depth="0.3" height="2.51" width="6" position="0 1.63 3.15"></a-box>
       <a-box color="#E7CFB7" depth="0.3" height="2.51" width="6" position="0 1.63 -3.15"></a-box>
       <a-box color="#E7CFB7" depth="6" height="2.51" width="0.3" position="3.15 1.63 0"></a-box>
