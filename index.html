@@ -7,62 +7,183 @@
   </head>
   <body>
     <script>
-    AFRAME.registerComponent('limit-my-distance', {
-      init: function() {
-      },
-      tick: function() {
-        // limit Z
-        if (this.el.object3D.position.z > 2.9) {
-          this.el.object3D.position.z = 2.9;
-        }
-        if (this.el.object3D.position.z < -2) {
-          this.el.object3D.position.z = -2;
-        }
+      // Custom component to limit the distance from the center
+      AFRAME.registerComponent('limit-my-distance', {
+        init: function() {},
+        tick: function() {
+          // limit Z
+          if (this.el.object3D.position.z > 2.9) this.el.object3D.position.z = 2.9;
+          if (this.el.object3D.position.z < -2) this.el.object3D.position.z = -2;
 
-        // limit X
-        if (this.el.object3D.position.x > 2.9) {
-          this.el.object3D.position.x = 2.9;
+          // limit X
+          if (this.el.object3D.position.x > 2.9) this.el.object3D.position.x = 2.9;
+          if (this.el.object3D.position.x < -2.9) this.el.object3D.position.x = -2.9;
         }
-        if (this.el.object3D.position.x < -2.9) {
-          this.el.object3D.position.x = -2.9;
-        }
+      });
 
-      }
-    });
-</script>
-    <a-scene precision="low" shadow="type: pcfsoft">
+      // Custom component to toggle TV state
+      AFRAME.registerComponent('toggle-tv', {
+        schema: {
+          isOn: { type: 'boolean', default: false }
+        },
+        init: function() {
+          this.el.addEventListener('click', () => {
+            this.data.isOn = !this.data.isOn; // Toggle state
+            const tv = document.querySelector('#TV');
+            const tvLight = document.querySelector('#TV2');
+
+            if (this.data.isOn) {
+              tv.setAttribute('material', 'color', 'lightblue');
+              tv.setAttribute('material', 'emissive', 'lightblue');
+              tvLight.setAttribute('light', 'intensity', 1);
+            } else {
+              tv.setAttribute('material', 'color', 'black');
+              tv.setAttribute('material', 'emissive', 'black');
+              tvLight.setAttribute('light', 'intensity', 0);
+            }
+          });
+        }
+      });
+
+      // Custom component to toggle lights state
+      AFRAME.registerComponent('toggle-lights', {
+        schema: {
+          isOn: { type: 'boolean', default: false }
+        },
+        init: function() {
+          this.el.addEventListener('click', () => {
+            this.data.isOn = !this.data.isOn; // Toggle state
+            const light1 = document.querySelector('#LIGHT1');
+            const light2 = document.querySelector('#LIGHT2');
+            const light3 = document.querySelector('#LIGHT3');
+            const light4 = document.querySelector('#LIGHT4');
+            const scene = document.querySelector('#scene');
+
+            if (this.data.isOn) {
+              light1.setAttribute('material', 'color', '#FFFFAA');
+              light2.setAttribute('material', 'color', '#FFFFAA');
+              light3.setAttribute('light', 'intensity', 1);
+              light4.setAttribute('light', 'intensity', 1);
+              light1.setAttribute('material', 'emissive', '#FFFFAA');
+              light2.setAttribute('material', 'emissive', '#FFFFAA');
+              scene.setAttribute('fog', 'color', '#FFFFAA');
+            } else {
+              light1.setAttribute('material', 'color', 'lightgrey');
+              light2.setAttribute('material', 'color', 'lightgrey');
+              light3.setAttribute('light', 'intensity', 0);
+              light4.setAttribute('light', 'intensity', 0);
+              light1.setAttribute('material', 'emissive', 'black');
+              light2.setAttribute('material', 'emissive', 'black');
+              scene.setAttribute('fog', 'color', '#AAA');
+            }
+          });
+        }
+      });
+
+      // Custom component to toggle the curtains, adjust the light intensity, and show indicator
+      AFRAME.registerComponent('toggle-curtains', {
+        schema: {
+          isOpen: { type: 'boolean', default: true } // Start in the open state
+        },
+        init: function() {
+          this.el.addEventListener('click', () => {
+            this.data.isOpen = !this.data.isOpen; // Toggle state
+            const leftCurtain = document.querySelector('#left-curtain');
+            const rightCurtain = document.querySelector('#right-curtain');
+            const light = document.querySelector('#LIGHT'); // Correct light ID
+            const indicator = document.querySelector('#indicator'); // Obtener el indicador
+
+            if (this.data.isOpen) {
+              // Abrir cortinas (volver a su tamaño y posición original)
+              leftCurtain.setAttribute('animation__scale', 'property: scale; to: 1 1 1; dur: 4000;');
+              leftCurtain.setAttribute('animation__position', 'property: position; to: -2.97 1.5 1.5; dur: 4000;');
+
+              rightCurtain.setAttribute('animation__scale', 'property: scale; to: 1 1 1; dur: 4000;');
+              rightCurtain.setAttribute('animation__position', 'property: position; to: -2.97 1.5 -1.5; dur: 4000;');
+
+              // Restaurar la luz a su intensidad original (1)
+              light.setAttribute('animation__intensity', 'property: light.intensity; to: 1; dur: 4000;');
+
+              // Ocultar el indicador cuando las cortinas están abiertas
+              indicator.setAttribute('visible', 'false');
+            } else {
+              // Cerrar cortinas (expandir y moverlas hacia adentro en Z al mismo tiempo, pero sin superposición)
+              leftCurtain.setAttribute('animation__scale', 'property: scale; to: 1 1 3; dur: 4000;');
+              leftCurtain.setAttribute('animation__position', 'property: position; to: -2.97 1.5 0.7; dur: 4000;');
+
+              rightCurtain.setAttribute('animation__scale', 'property: scale; to: 1 1 3; dur: 4000;');
+              rightCurtain.setAttribute('animation__position', 'property: position; to: -2.97 1.5 -0.7; dur: 4000;');
+
+              // Disminuir la luz gradualmente al cerrar las cortinas (intensidad a 0.1)
+              light.setAttribute('animation__intensity', 'property: light.intensity; to: 0; dur: 4000;');
+
+              // Mostrar el indicador cuando las cortinas están cerradas
+              indicator.setAttribute('visible', 'true');
+            }
+          });
+        }
+      });
+      
+    </script>
+
+    <a-scene id="scene" fog="type: linear; near: 1; far: 10; color: #AAA">
       <a-assets>
         <a-asset-item id="model" src="https://cdn.glitch.global/2c82ccfd-f5a9-41b4-9ec4-8807b5f9d466/Habitacion%20Ortogonal.glb?v=1739210379657"></a-asset-item>
       </a-assets>
-      <a-box id="TV" color="lightblue" depth="0.05" height="0.75" width="1.65" position="-0.1 1.635 -2.59"></a-box>
-      <a-box color="grey" depth="0.15" height="0.02" width="0.05" position="0.5 1.1 -2.3"
-             event-set__tv="_event: mousedown; _target: #TV; material.color: lightblue"
-             event-set__tv2="_event: mousedown; _target: #TV; material.emissive: lightblue"
-             event-set__tv3="_event: mousedown; _target: #TV2; light.intensity: 1"></a-box>
-      <a-box id="LIGHT" color="lightgrey" depth="0.33" height="0.76" width="0.33" position="-2.465 1.7 -2.49"></a-box>
-      <a-box id="LIGHT2" color="lightgrey" depth="0.33" height="0.76" width="0.33" position="2.3 1.7 -2.49"></a-box>
-      <a-box color="Tan" depth="0.15" height="0.02" width="0.05" position="-1.8 1.18 -2.1"
-             event-set__lights1="_event: mousedown; _target: #LIGHT; material.color: #FFFFAA"
-             event-set__lights2="_event: mousedown; _target: #LIGHT2; material.color: #FFFFAA"
-             event-set__lights3="_event: mousedown; _target: #LIGHT3; light.intensity: 1"
-             event-set__lights4="_event: mousedown; _target: #LIGHT4; light.intensity: 1"
-             event-set__lights5="_event: mousedown; _target: #LIGHT; material.emissive: #FFFFAA"
-             event-set__lights6="_event: mousedown; _target: #LIGHT2; material.emissive: #FFFFAA"
+
+      <!-- TV -->
+      <a-box id="TV" color="black" depth="0.05" height="0.75" width="1.65" position="-0.1 1.635 -2.59"></a-box>
+      <a-box id="tv-button" color="grey" depth="0.15" height="0.02" width="0.05" position="0.5 1.1 -2.3"
+             toggle-tv
              event-set__enter="_event: mouseenter; _target: #TEXT1; visible: true"
              event-set__leave="_event: mouseleave; _target: #TEXT1; visible: false">
-             <a-text id="TEXT1" value="Pulsa para activar las luces" scale="0.2 0.2 0.2" position="-0.2 0.2 0" visible= "false"></a-text>
+        <a-text id="TEXT1" value="Pulsa para activar/desactivar la TV" scale="0.2 0.2 0.2" position="-0.25 0.2 0" visible="false"></a-text>
       </a-box>
+
+      <!-- Lights -->
+      <a-box id="LIGHT1" color="lightgrey" depth="0.33" height="0.76" width="0.33" position="-2.465 1.7 -2.49"></a-box>
+      <a-box id="LIGHT2" color="lightgrey" depth="0.33" height="0.76" width="0.33" position="2.3 1.7 -2.49"></a-box>
+      <a-box id="light-button" color="Tan" depth="0.15" height="0.02" width="0.05" position="-1.8 1.18 -2.1"
+             toggle-lights
+             event-set__enter="_event: mouseenter; _target: #TEXT2; visible: true"
+             event-set__leave="_event: mouseleave; _target: #TEXT2; visible: false">
+        <a-text id="TEXT2" value="Pulsa para activar/desactivar las luces" scale="0.2 0.2 0.2" position="-0.25 0.2 0" visible="false"></a-text>
+      </a-box>
+
+      <!-- Curtains -->
+      <a-box id="left-curtain" color="#ACE78F" depth="0.5" height="2.4" width="0.05" position="-2.97 1.5 1.5" scale="1 1 1"></a-box>
+      <a-box id="right-curtain" color="#ACE78F" depth="0.5" height="2.4" width="0.05" position="-2.97 1.5 -1.5" scale="1 1 1"></a-box>
+
+      <!-- Tirador muy fino al lado de la cortina derecha, ajustado más cerca de la cortina en Z -->
+      <a-box id="curtain-puller" color="grey" depth="0.02" height="2.4" width="0.02" position="-2.97 1.5 -1.9"
+             toggle-curtains
+             event-set__enter="_event: mouseenter; _target: #TEXT3; visible: true"
+             event-set__leave="_event: mouseleave; _target: #TEXT3; visible: false">
+        <a-text id="TEXT3" value="Pulsa para abrir/cerrar las cortinas" scale="0.2 0.2 0.2" position="0.2 0 0.5" visible="false"
+                rotation="0 90 0"></a-text>
+      </a-box>
+
+      <!-- Indicador de estado de la cortina (brillante cuando cerrada) -->
+      <a-box id="indicator" color="grey" depth="0.05" height="0.1" width="0.1" position="-2.97 1.5 -2"
+             emissive="color: red; intensity: 1" visible="false"></a-box>
+      
+      <!-- Luz -->
+      <a-entity id="LIGHT" light="type: point; intensity: 1; distance: 10; decay: 5;" position="-2.975 1.5 0"></a-entity>
+      
+      <!-- Componente de cortinas para abrir y cerrar -->
+      <a-entity toggle-curtains></a-entity>
+      
+      <!-- Other entities -->
       <a-box color="#E7CFB7" depth="0.3" height="2.51" width="6" position="0 1.63 3.15"></a-box>
       <a-box color="#E7CFB7" depth="0.3" height="2.51" width="6" position="0 1.63 -3.15"></a-box>
       <a-box color="#E7CFB7" depth="6" height="2.51" width="0.3" position="3.15 1.63 0"></a-box>
       <a-box color="#E7CFB7" depth="6" height="0.1" width="6" position="0 2.8 0"></a-box>
       <a-entity id="LIGHT3" light="type: point; color: #FFFFAA; intensity: 0; distance: 5; decay: 2;" position="-2.465 1.7 -2.49"></a-entity>
       <a-entity id="LIGHT4" light="type: point; color: #FFFFAA; intensity: 0; distance: 5; decay: 2;" position="2.3 1.7 -2.49"></a-entity>
-      <a-entity light="type: point; intensity: 1; distance: 10; decay: 5;" position="-2.975 1.5 0"></a-entity>
       <a-entity id="TV2" light="type: spot; color: lightblue; intensity: 0; angle: 45; distance: 10; decay: 2; penumbra:0.5;" rotation="0 180 0" position="-0.1 1.635 -2.59"></a-entity>
       <a-entity gltf-model="#model" scale="3 3 3"></a-entity>
       <a-camera limit-my-distance wasd-controls="acceleration:15">
-      <a-cursor></a-cursor>
+        <a-cursor></a-cursor>
       </a-camera>
     </a-scene>
   </body>
