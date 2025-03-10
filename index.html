@@ -67,6 +67,8 @@
               light1.setAttribute('material', 'emissive', '#FFFFAA');
               light2.setAttribute('material', 'emissive', '#FFFFAA');
               scene.setAttribute('fog', 'color', '#FFFFAA');
+              var entity = document.querySelector('[sound]');
+              entity.components.sound.playSound();
             } else {
               light1.setAttribute('material', 'color', 'lightgrey');
               light2.setAttribute('material', 'color', 'lightgrey');
@@ -75,6 +77,7 @@
               light1.setAttribute('material', 'emissive', 'black');
               light2.setAttribute('material', 'emissive', 'black');
               scene.setAttribute('fog', 'color', '#AAA');
+              entity.components.sound.stopSound();
             }
           });
         }
@@ -106,6 +109,7 @@
 
               // Ocultar el indicador cuando las cortinas están abiertas
               indicator.setAttribute('visible', 'false');
+              indicator2.setAttribute('visible', 'false');
             } else {
               // Cerrar cortinas (expandir y moverlas hacia adentro en Z al mismo tiempo, pero sin superposición)
               leftCurtain.setAttribute('animation__scale', 'property: scale; to: 1 1 3; dur: 4000;');
@@ -119,52 +123,58 @@
 
               // Mostrar el indicador cuando las cortinas están cerradas
               indicator.setAttribute('visible', 'true');
+              indicator2.setAttribute('visible', 'true');
             }
           });
         }
       });
       
     </script>
-
+    
+    <!-- Escena principal -->
     <a-scene id="scene" fog="type: linear; near: 1; far: 10; color: #AAA">
+      
       <a-assets>
         <a-asset-item id="model" src="https://cdn.glitch.global/2c82ccfd-f5a9-41b4-9ec4-8807b5f9d466/Habitacion%20Ortogonal.glb?v=1739210379657"></a-asset-item>
       </a-assets>
 
       <!-- TV -->
       <a-box id="TV" color="black" depth="0.05" height="0.75" width="1.65" position="-0.1 1.635 -2.59"></a-box>
-      <a-box id="tv-button" color="grey" depth="0.15" height="0.02" width="0.05" position="0.5 1.1 -2.3"
+      <a-box id="tv-button" emissive="grey" depth="0.15" height="0.02" width="0.05" position="0.5 1.1 -2.3"
              toggle-tv
              event-set__enter="_event: mouseenter; _target: #TEXT1; visible: true"
              event-set__leave="_event: mouseleave; _target: #TEXT1; visible: false">
-        <a-text id="TEXT1" value="Pulsa para activar/desactivar la TV" scale="0.2 0.2 0.2" position="-0.25 0.2 0" visible="false"></a-text>
       </a-box>
+      <a-plane id="TEXT1" text="value: Pulsa para activar / desactivar la TV; wrap-count: 20" height="0.2" width="1" position="0.5 1.3 -2.3" opacity="0.5" visible="false"></a-plane>
 
       <!-- Lights -->
       <a-box id="LIGHT1" color="lightgrey" depth="0.33" height="0.76" width="0.33" position="-2.465 1.7 -2.49"></a-box>
       <a-box id="LIGHT2" color="lightgrey" depth="0.33" height="0.76" width="0.33" position="2.3 1.7 -2.49"></a-box>
-      <a-box id="light-button" color="Tan" depth="0.15" height="0.02" width="0.05" position="-1.8 1.18 -2.1"
+      <a-box id="light-button" emissive="Tan" depth="0.15" height="0.02" width="0.05" position="-1.8 1.18 -2.1"
              toggle-lights
              event-set__enter="_event: mouseenter; _target: #TEXT2; visible: true"
              event-set__leave="_event: mouseleave; _target: #TEXT2; visible: false">
-        <a-text id="TEXT2" value="Pulsa para activar/desactivar las luces" scale="0.2 0.2 0.2" position="-0.25 0.2 0" visible="false"></a-text>
       </a-box>
+      <a-sound id="LIGHTSOUND" src="src: url(https://cdn.glitch.global/2c82ccfd-f5a9-41b4-9ec4-8807b5f9d466/Luces.mp3?v=1741636699201)" position="-1.8 1.18 -2.1"></a-sound>
+      <a-plane id="TEXT2" text="value: Pulsa para activar / desactivar las luces; wrap-count: 20" height="0.2" width="1" position="-1.8 1.3 -2.1" opacity="0.5" visible="false"></a-plane>
 
       <!-- Curtains -->
       <a-box id="left-curtain" color="#ACE78F" depth="0.5" height="2.4" width="0.05" position="-2.97 1.5 1.5" scale="1 1 1"></a-box>
       <a-box id="right-curtain" color="#ACE78F" depth="0.5" height="2.4" width="0.05" position="-2.97 1.5 -1.5" scale="1 1 1"></a-box>
 
       <!-- Tirador muy fino al lado de la cortina derecha, ajustado más cerca de la cortina en Z -->
-      <a-box id="curtain-puller" color="grey" depth="0.02" height="2.4" width="0.02" position="-2.97 1.5 -1.9"
+      <a-box id="curtain-puller" emissive="grey" depth="0.02" height="2.4" width="0.02" position="-2.97 1.5 -1.9"
              toggle-curtains
              event-set__enter="_event: mouseenter; _target: #TEXT3; visible: true"
              event-set__leave="_event: mouseleave; _target: #TEXT3; visible: false">
-        <a-text id="TEXT3" value="Pulsa para abrir/cerrar las cortinas" scale="0.2 0.2 0.2" position="0.2 0 0.5" visible="false"
-                rotation="0 90 0"></a-text>
       </a-box>
+      <a-plane id="TEXT3" text="value: Pulsa para abrir / cerrar las cortinas; wrap-count: 20" height="0.2" width="1" position="-2.8 1.5 -1.9" opacity="0.5" visible="false"
+                rotation="0 90 0"></a-plane>
 
       <!-- Indicador de estado de la cortina (brillante cuando cerrada) -->
-      <a-box id="indicator" color="grey" depth="0.05" height="0.1" width="0.1" position="-2.97 1.5 -2"
+      <a-box id="indicator" color="grey" depth="0.02" height="2.4" width="0.02" position="-2.97 1.5 -1.9"
+             emissive="color: red; intensity: 1" visible="false"></a-box>
+      <a-box id="indicator2" color="grey" depth="0.02" height="2.4" width="0.02" position="-2.97 1.5 -1.9"
              emissive="color: red; intensity: 1" visible="false"></a-box>
       
       <!-- Luz -->
@@ -183,7 +193,7 @@
       <a-entity id="TV2" light="type: spot; color: lightblue; intensity: 0; angle: 45; distance: 10; decay: 2; penumbra:0.5;" rotation="0 180 0" position="-0.1 1.635 -2.59"></a-entity>
       <a-entity gltf-model="#model" scale="3 3 3"></a-entity>
       <a-camera limit-my-distance wasd-controls="acceleration:15">
-        <a-cursor></a-cursor>
+        <a-cursor far="0.1"></a-cursor>
       </a-camera>
     </a-scene>
   </body>
